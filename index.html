@@ -761,46 +761,132 @@
 
       /* ── 7-day plan ── */
       const top2 = sorted[1];
+      const top2Book = {
+        vocab:     { basic: 'ターゲット1900 1〜50番', standard: 'システム英単語 50語', advanced: '鉄壁 30語' },
+        structure: { basic: '入門英文解釈の技術70 例題3問', standard: '基礎英文解釈の技術100 例題3問', advanced: 'ポレポレ 例題3問' },
+        logic:     { basic: 'パラグラフリーディング① 1〜2題', standard: 'やっておきたい300 1題（段落要約）', advanced: 'やっておきたい500 1題（論理図示）' },
+        speed:     { basic: 'ハイパートレーニング① 1題音読×5回', standard: 'やっておきたい300 1題タイムアタック', advanced: 'やっておきたい500 1題（時間計測）' },
+      };
       const PLANS = {
-        vocab: [
-          { day: 'Day 1', color: top.color,  title: `単語基礎固め（${level==='basic'?'ターゲット50語':level==='standard'?'シス単50語':'鉄壁30語'}）`,  desc: '未知語をリストアップ。語根グループで整理する' },
-          { day: 'Day 2', color: top.color,  title: 'Day1の確認テスト＋語彙問題演習',  desc: '自己テストで定着確認。文脈型問題10問に挑戦' },
-          { day: 'Day 3', color: top2.color, title: `${top2.name}の集中演習`,          desc: '第2弱点を補強。基礎問題から標準問題へ段階的に進む' },
-          { day: 'Day 4', color: top.color,  title: '単語継続（50語）＋短文読解',      desc: '語彙を文脈で使う練習。精読で定着を確認' },
-          { day: 'Day 5', color: '#475569',  title: '長文読解（語彙に注目）',           desc: '未知語をゼロにした状態で読み直す体験を積む' },
-          { day: 'Day 6', color: top2.color, title: `${top2.name}の応用演習`,          desc: '標準〜発展レベルの問題で実力を試す' },
-          { day: 'Day 7', color: '#7c3aed',  title: '模試形式・総まとめ',               desc: '時間計測しながら長文1題。全弱点の進捗を確認する' },
-        ],
-        structure: [
-          { day: 'Day 1', color: top.color,  title: `SVOC解析（${level==='basic'?'入門70':level==='standard'?'基礎100':'ポレポレ'} 例題3問）`, desc: '品詞・文型を図示しながら解析する基礎トレーニング' },
-          { day: 'Day 2', color: top.color,  title: '難構文精読（関係詞・分詞・倒置）',  desc: '3文を丁寧に解析し、構文把握の型を固める' },
-          { day: 'Day 3', color: top2.color, title: `${top2.name}の基礎補強`,            desc: '第2弱点に取り組み、バランスよく改善を進める' },
-          { day: 'Day 4', color: top.color,  title: '構文を意識した短文読解（5題）',     desc: '各文のSVを明示してから意味を取る練習' },
-          { day: 'Day 5', color: '#475569',  title: '長文読解（構文意識）',               desc: '難解文に出会ったら立ち止まって解析する習慣を作る' },
-          { day: 'Day 6', color: top2.color, title: `${top2.name}の応用問題`,            desc: '実戦形式の問題で弱点が残っていないか確認する' },
-          { day: 'Day 7', color: '#7c3aed',  title: '模試形式・総まとめ',                desc: '通し読みして正確に内容が取れているか検証する' },
-        ],
-        logic: [
-          { day: 'Day 1', color: top.color,  title: '論理マーカー20語を整理',            desc: '逆接・順接・例示・強調のグループに分けて暗記する' },
-          { day: 'Day 2', color: top.color,  title: '段落要約練習（3段落）',              desc: 'トピックセンテンスを特定し、段落を1文で要約する' },
-          { day: 'Day 3', color: top2.color, title: `${top2.name}の集中練習`,            desc: '第2弱点を並行して補強する' },
-          { day: 'Day 4', color: top.color,  title: 'パラグラフリーディング演習',         desc: '第1段落→最終段落→残りの順で読む戦略を練習する' },
-          { day: 'Day 5', color: '#475569',  title: '論理追跡しながら長文読解',           desc: '接続詞に下線を引きながら読み、論理の流れを図示する' },
-          { day: 'Day 6', color: top2.color, title: `${top2.name}の応用問題`,            desc: '要旨把握・内容一致問題で得点できるか確認' },
-          { day: 'Day 7', color: '#7c3aed',  title: '模試形式・総まとめ',                desc: '全体の論理展開を意識して長文1題を通読する' },
-        ],
-        speed: [
-          { day: 'Day 1', color: top.color,  title: '音読練習（既読文×5回）',            desc: 'スラスラ読めるまで繰り返す。リズムで英語を処理する感覚を作る' },
-          { day: 'Day 2', color: top.color,  title: 'スラッシュリーディング入門',         desc: '意味のまとまりでスラッシュを入れ、前から意味を取る練習' },
-          { day: 'Day 3', color: top2.color, title: `${top2.name}の補強`,                desc: '速度を落とす原因になっている弱点を並行して改善する' },
-          { day: 'Day 4', color: top.color,  title: `タイムアタック読解（${level==='basic'?'易しい英文':'標準英文'}）`, desc: '目標：150wpm。ストップウォッチで計測しながら読む' },
-          { day: 'Day 5', color: '#475569',  title: '時間制限つき長文読解',               desc: '本番と同じ制限時間で解き、タイムマネジメントを練習する' },
-          { day: 'Day 6', color: top2.color, title: `${top2.name}の応用演習`,            desc: '速度とともに精度も上がっているか確認する' },
-          { day: 'Day 7', color: '#7c3aed',  title: '模試形式・総仕上げ',                desc: '時間計測しながら長文1題。今週の成長を確認する' },
-        ],
+        vocab: {
+          basic: [
+            { day: 'Day 1', color: top.color,  title: 'ターゲット1900 1〜50番（50語）新規暗記',        desc: '赤シートで隠しながら3往復。知らない語に鉛筆チェック' },
+            { day: 'Day 2', color: top.color,  title: 'ターゲット51〜100番（50語）＋ 1〜50番確認テスト', desc: '前日分を白紙テスト→正解率80%未満なら再暗記してから新規へ' },
+            { day: 'Day 3', color: top2.color, title: `${top2.name}：${top2Book[top2.key].basic}`,     desc: '第2弱点を補強。基礎問題から段階的に進める' },
+            { day: 'Day 4', color: top.color,  title: 'ターゲット101〜150番（50語）＋ 1〜100番復習',   desc: '既習100語を5分でスキャン → 新規50語へ。語義は例文で確認' },
+            { day: 'Day 5', color: '#475569',  title: 'シス単Basic 例文音読（20文）＋長文読解1題',      desc: 'ハイパートレーニング①から1題。未知語ゼロで読める感覚を掴む' },
+            { day: 'Day 6', color: top2.color, title: `${top2.name}：${top2Book[top2.key].basic}（応用）`, desc: '実戦形式で弱点が残っていないか確認する' },
+            { day: 'Day 7', color: '#7c3aed',  title: '模試形式1題（時間計測）＋ 1〜150番総スキャン', desc: '長文を時間内に解く → 終了後に全単語を高速スキャンして定着確認' },
+          ],
+          standard: [
+            { day: 'Day 1', color: top.color,  title: 'システム英単語 1001〜1050番（50語）新規暗記',       desc: 'ミニマルペアを比較しながら例文ごと暗記。チャンクで覚える' },
+            { day: 'Day 2', color: top.color,  title: 'システム英単語 1051〜1100番（50語）＋ 1001〜1050番テスト', desc: '前日分を白紙テスト → 正解率80%未満なら再暗記してから新規へ' },
+            { day: 'Day 3', color: top2.color, title: `${top2.name}：${top2Book[top2.key].standard}`,    desc: '第2弱点を補強。基礎問題から標準問題へ段階的に進む' },
+            { day: 'Day 4', color: top.color,  title: 'システム英単語 1101〜1150番（50語）＋語彙推測10問', desc: '新規50語 → 文脈から意味推測する実戦問題10問で定着確認' },
+            { day: 'Day 5', color: '#475569',  title: 'ターゲット1900（全範囲）速習スキャン＋長文1題',   desc: 'やっておきたい300から1題。語彙が実際の読解にどう効くか確認' },
+            { day: 'Day 6', color: top2.color, title: `${top2.name}：${top2Book[top2.key].standard}（応用）`, desc: '標準〜発展レベルの問題で実力を試す' },
+            { day: 'Day 7', color: '#7c3aed',  title: '模試形式1題（時間計測）＋ 1001〜1150番総スキャン', desc: '長文を時間内に解く → 終了後に今週分の単語を高速で確認' },
+          ],
+          advanced: [
+            { day: 'Day 1', color: top.color,  title: '鉄壁 語根グループ1つ（30語）精習',              desc: '語根・接頭辞から派生語を芋づる式に展開して覚える' },
+            { day: 'Day 2', color: top.color,  title: '鉄壁 Day1の復習（30語）＋多義語確認10語',       desc: '白紙テスト → 多義語は文脈ごとに意味を書き分ける練習' },
+            { day: 'Day 3', color: top2.color, title: `${top2.name}：${top2Book[top2.key].advanced}`,   desc: '第2弱点を補強。難関大水準の問題から始める' },
+            { day: 'Day 4', color: top.color,  title: '鉄壁 新規グループ（30語）＋派生語10語追加',     desc: 'システム英単語1200番以降の高難度語と照合しながら強化' },
+            { day: 'Day 5', color: '#475569',  title: 'やっておきたい500 1題（語彙に注目）',           desc: '高難度語が出た箇所を抽出し、語義と文脈をノートに記録' },
+            { day: 'Day 6', color: top2.color, title: `${top2.name}：${top2Book[top2.key].advanced}（応用）`, desc: '発展レベルの問題で精度を確認する' },
+            { day: 'Day 7', color: '#7c3aed',  title: '模試形式1題（時間計測）＋ 今週の語彙総確認',    desc: '長文を時間内に解く → 登場した高難度語を全て意味確認' },
+          ],
+        },
+        structure: {
+          basic: [
+            { day: 'Day 1', color: top.color,  title: '入門英文解釈の技術70 例題1〜3（SVOC図示）',      desc: '品詞・文型を紙に図示しながら解析。答え合わせで型を確認' },
+            { day: 'Day 2', color: top.color,  title: '入門英文解釈の技術70 例題4〜6＋大岩英文法 1章',  desc: '前日の3問を復習してから新規3問へ。文法の根拠も確認' },
+            { day: 'Day 3', color: top2.color, title: `${top2.name}：${top2Book[top2.key].basic}`,     desc: '第2弱点を補強。基礎問題から段階的に進める' },
+            { day: 'Day 4', color: top.color,  title: '入門英文解釈の技術70 例題7〜9（関係詞中心）',   desc: '関係詞節の修飾範囲をカッコでくくる練習。SVを先に特定する' },
+            { day: 'Day 5', color: '#475569',  title: 'ハイパートレーニング① 1題（構文意識して精読）', desc: '難解文に出会ったら止まって入門70の型で解析する習慣をつける' },
+            { day: 'Day 6', color: top2.color, title: `${top2.name}：${top2Book[top2.key].basic}（応用）`, desc: '実戦形式で弱点が残っていないか確認する' },
+            { day: 'Day 7', color: '#7c3aed',  title: '模試形式1題（時間計測）＋ 例題1〜9の解析復習',  desc: '通し読み → 構文でつまずいた箇所を入門70の解答と照合' },
+          ],
+          standard: [
+            { day: 'Day 1', color: top.color,  title: '基礎英文解釈の技術100 例題1〜3（SVOC図示）',    desc: '品詞・文型を紙に図示。特に分詞構文・比較構文を丁寧に解析' },
+            { day: 'Day 2', color: top.color,  title: '基礎英文解釈の技術100 例題4〜6（関係詞・倒置）',desc: '前日3問を復習してから新規3問へ。倒置は元の語順に戻してSV確認' },
+            { day: 'Day 3', color: top2.color, title: `${top2.name}：${top2Book[top2.key].standard}`,  desc: '第2弱点を補強。バランスよく改善を進める' },
+            { day: 'Day 4', color: top.color,  title: '基礎英文解釈の技術100 例題7〜9＋短文演習5題',  desc: '各文のSVを明示してから読む練習。目標：1文60秒以内で解析' },
+            { day: 'Day 5', color: '#475569',  title: 'やっておきたい300 1題（構文意識して精読）',    desc: '難解文を抽出 → 基礎100の型を使って解析し直す' },
+            { day: 'Day 6', color: top2.color, title: `${top2.name}：${top2Book[top2.key].standard}（応用）`, desc: '実戦形式で弱点が残っていないか確認する' },
+            { day: 'Day 7', color: '#7c3aed',  title: '模試形式1題（時間計測）＋ 例題1〜9の解析復習',  desc: '通し読み → 構文でつまずいた箇所を基礎100の解答と照合' },
+          ],
+          advanced: [
+            { day: 'Day 1', color: top.color,  title: 'ポレポレ 例題1〜3（思考プロセスを声に出す）',   desc: '解答プロセスを声に出しながら確認。なぜその解釈になるか根拠を言語化' },
+            { day: 'Day 2', color: top.color,  title: 'ポレポレ 例題4〜6（英文読解の透視図と照合）',   desc: '前日3問を復習 → 透視図で同種の構文を確認し類題で定着' },
+            { day: 'Day 3', color: top2.color, title: `${top2.name}：${top2Book[top2.key].advanced}`,   desc: '第2弱点を補強。難関大水準の問題から始める' },
+            { day: 'Day 4', color: top.color,  title: 'ポレポレ 例題7〜9＋過去問難構文3文の解析',      desc: '過去問から難解文を3文抜き出し、解釈を書き起こす' },
+            { day: 'Day 5', color: '#475569',  title: 'やっておきたい500 1題（構文意識して通読）',    desc: '難解文を抽出 → ポレポレの型で解析。所要時間も記録する' },
+            { day: 'Day 6', color: top2.color, title: `${top2.name}：${top2Book[top2.key].advanced}（応用）`, desc: '発展レベルの問題で精度を確認する' },
+            { day: 'Day 7', color: '#7c3aed',  title: '模試形式1題（時間計測）＋ 例題1〜9の解析復習',  desc: '通し読み → 構文でつまずいた箇所をポレポレの解答と照合' },
+          ],
+        },
+        logic: {
+          basic: [
+            { day: 'Day 1', color: top.color,  title: 'パラグラフリーディングのストラテジー① 第1〜2章', desc: '逆接・順接・例示・強調に論理マーカーを分類して暗記ノートを作る' },
+            { day: 'Day 2', color: top.color,  title: 'パラグラフリーディング① 例題2題（段落要約）',   desc: 'トピックセンテンスを特定し、各段落を1文で要約する練習' },
+            { day: 'Day 3', color: top2.color, title: `${top2.name}：${top2Book[top2.key].basic}`,     desc: '第2弱点を補強。基礎問題から段階的に進める' },
+            { day: 'Day 4', color: top.color,  title: 'ハイパートレーニング① 1題（接続詞に下線）',    desc: '読みながら接続詞・論理マーカーに全て下線 → 論理の流れを矢印で図示' },
+            { day: 'Day 5', color: '#475569',  title: 'パラグラフリーディング① 演習2題（通し）',      desc: '第1段落→最終段落→残りの順で読む戦略を意識して解く' },
+            { day: 'Day 6', color: top2.color, title: `${top2.name}：${top2Book[top2.key].basic}（応用）`, desc: '要旨把握問題で得点できるか実戦確認' },
+            { day: 'Day 7', color: '#7c3aed',  title: '模試形式1題（時間計測）＋ 論理マーカー総確認', desc: '長文を解く → 接続詞・マーカーを全部チェック。今週の暗記ノートと照合' },
+          ],
+          standard: [
+            { day: 'Day 1', color: top.color,  title: 'パラグラフリーディング② 第1〜2章（対比・強調系）', desc: 'in contrast / consequently など20語を整理してノートにまとめる' },
+            { day: 'Day 2', color: top.color,  title: 'やっておきたい300 1題（段落要約＋論理図示）',    desc: '各段落を1文で要約 → 段落関係を矢印・記号で可視化してから設問へ' },
+            { day: 'Day 3', color: top2.color, title: `${top2.name}：${top2Book[top2.key].standard}`,  desc: '第2弱点を補強。バランスよく改善を進める' },
+            { day: 'Day 4', color: top.color,  title: 'パラグラフリーディング② 例題2題（応用）',      desc: 'パラグラフの役割分類（主張・根拠・例示・反論）を意識して読む' },
+            { day: 'Day 5', color: '#475569',  title: 'やっておきたい300 1題（論理追跡通読）',        desc: 'マーカーに下線 → 論理構造を図示してから設問を解く。制限時間内で完結' },
+            { day: 'Day 6', color: top2.color, title: `${top2.name}：${top2Book[top2.key].standard}（応用）`, desc: '内容一致問題で論理把握が得点につながるか確認' },
+            { day: 'Day 7', color: '#7c3aed',  title: '模試形式1題（時間計測）＋ ディスコースマーカー確認', desc: '長文を解く → 出てきたマーカーを全部抽出し、パラグラフリーディング②と照合' },
+          ],
+          advanced: [
+            { day: 'Day 1', color: top.color,  title: 'やっておきたい500 1題（論理構造図示）',         desc: 'ディスコースマーカー30語を分類確認 → 段落ごとの役割を矢印・記号で可視化' },
+            { day: 'Day 2', color: top.color,  title: '英語長文問題精講 1題（論理追跡精読）',          desc: '複雑な論理が展開される段落を特定し、段落関係を図式化してから設問を解く' },
+            { day: 'Day 3', color: top2.color, title: `${top2.name}：${top2Book[top2.key].advanced}`,   desc: '第2弱点を補強。難関大水準の問題から始める' },
+            { day: 'Day 4', color: top.color,  title: 'やっておきたい500 1題（スキミング→精読）',     desc: '第1・最終段落から主張を掴み → 残りは根拠探しとして読む戦略を実践' },
+            { day: 'Day 5', color: '#475569',  title: '英語長文問題精講 1題（制限時間内で解く）',      desc: '論理構造の把握と時間管理を両立する実戦訓練' },
+            { day: 'Day 6', color: top2.color, title: `${top2.name}：${top2Book[top2.key].advanced}（応用）`, desc: '発展レベルの問題で論理把握が得点につながるか確認' },
+            { day: 'Day 7', color: '#7c3aed',  title: '模試形式1題（時間計測）＋ 今週の論理図の振り返り', desc: '長文を解く → 今週図示した論理構造を振り返り、理解の深化を確認' },
+          ],
+        },
+        speed: {
+          basic: [
+            { day: 'Day 1', color: top.color,  title: 'ハイパートレーニング① 1題を音読×5回',          desc: '1回目は意味確認、2〜5回目は詰まらず読めるまで繰り返す。毎日継続が最重要' },
+            { day: 'Day 2', color: top.color,  title: 'DUO 3.0 例文20文のスラッシュリーディング',      desc: '意味のまとまりでスラッシュを入れ、前から意味を取る練習。戻り読みを禁止する' },
+            { day: 'Day 3', color: top2.color, title: `${top2.name}：${top2Book[top2.key].basic}`,     desc: '速度を落とす根本原因を並行して改善する' },
+            { day: 'Day 4', color: top.color,  title: 'ハイパートレーニング① 別の1題を音読×5回＋初見タイムアタック', desc: 'ストップウォッチで計測。目標は1分あたり100語（100wpm）' },
+            { day: 'Day 5', color: '#475569',  title: 'ハイパートレーニング① 2題を制限時間内で解く',  desc: '本番と同じ時間配分でタイムマネジメントを練習する' },
+            { day: 'Day 6', color: top2.color, title: `${top2.name}：${top2Book[top2.key].basic}（応用）`, desc: '速度が上がっているか確認しながら第2弱点を仕上げる' },
+            { day: 'Day 7', color: '#7c3aed',  title: '模試形式1題（時間計測）＋ 音読した全文を高速スキャン', desc: '今週の最速タイムで長文を解く。前後でwpmを比較して成長を確認' },
+          ],
+          standard: [
+            { day: 'Day 1', color: top.color,  title: 'やっておきたい300 1題をタイムアタック',         desc: 'ストップウォッチで計測。目標150wpm（300語文なら2分以内）。記録をノートにつける' },
+            { day: 'Day 2', color: top.color,  title: 'Day1の英文を音読×5回＋スラッシュリーディング', desc: '昨日解いた英文を使って音読で処理速度を上げる。止まった箇所を記録' },
+            { day: 'Day 3', color: top2.color, title: `${top2.name}：${top2Book[top2.key].standard}`,  desc: '速度を落とす根本原因を並行して改善する' },
+            { day: 'Day 4', color: top.color,  title: 'やっておきたい300 別の1題をタイムアタック',    desc: 'Day1の記録を超えることを目標に。wpmを計算して記録する' },
+            { day: 'Day 5', color: '#475569',  title: 'ハイパートレーニング② 1題（音読×3回＋速読）', desc: '音読で慣らした後に速読モードに切り替え。スラッシュ読みを組み合わせる' },
+            { day: 'Day 6', color: top2.color, title: `${top2.name}：${top2Book[top2.key].standard}（応用）`, desc: '速度が上がっているか確認しながら第2弱点を仕上げる' },
+            { day: 'Day 7', color: '#7c3aed',  title: '模試形式1題（時間計測）＋ 今週のwpm推移を確認', desc: '時間内に解けたか確認。Day1→Day7のwpm変化をグラフ化して成長を可視化' },
+          ],
+          advanced: [
+            { day: 'Day 1', color: top.color,  title: 'やっておきたい500 1題をタイムアタック',         desc: 'ストップウォッチで計測。目標180wpm（500語文なら2分40秒以内）。記録をつける' },
+            { day: 'Day 2', color: top.color,  title: 'パラグラフリーディング③ スキミング演習1題',    desc: '第1・最終段落を読み、残りは各段落の最初の1文だけで要旨を掴む練習' },
+            { day: 'Day 3', color: top2.color, title: `${top2.name}：${top2Book[top2.key].advanced}`,   desc: '速度を落とす根本原因を並行して改善する' },
+            { day: 'Day 4', color: top.color,  title: 'やっておきたい500 別の1題（スキャニング練習）', desc: '設問を先に読み → 必要情報だけを高速で探す練習。タイムも記録' },
+            { day: 'Day 5', color: '#475569',  title: '過去問長文1題（本番同条件で計測）',             desc: '本番と同じ制限時間・環境で解く。解答後にwpmを計算して記録' },
+            { day: 'Day 6', color: top2.color, title: `${top2.name}：${top2Book[top2.key].advanced}（応用）`, desc: '速度と精度が両立しているか確認する' },
+            { day: 'Day 7', color: '#7c3aed',  title: '模試形式1題（時間計測）＋ 今週のwpm推移確認',   desc: 'Day1→Day7のwpm変化をグラフ化。180wpm到達度と正答率を両方確認する' },
+          ],
+        },
       };
 
-      document.getElementById('plan-grid').innerHTML = PLANS[top.key].map(d => `
+      document.getElementById('plan-grid').innerHTML = PLANS[top.key][level].map(d => `
         <div class="plan-row">
           <span class="plan-day-label" style="background:${d.color}">${d.day}</span>
           <div class="plan-body">
