@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英語長文読解診断</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --vocab:     #6366f1;
+      --structure: #ec4899;
+      --logic:     #f59e0b;
+      --speed:     #14b8a6;
+      --bg:        #f1f5f9;
+      --card:      #ffffff;
+      --text:      #1e293b;
+      --muted:     #64748b;
+      --border:    #e2e8f0;
+      --radius:    14px;
+    }
+
+    body {
+      font-family: 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+    }
+
+    /* ── Layout ── */
+    .container { max-width: 600px; margin: 0 auto; }
+
+    /* ── Header ── */
+    .app-header { text-align: center; margin-bottom: 28px; }
+    .app-header .badge {
+      display: inline-block;
+      background: #ede9fe; color: #7c3aed;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: .08em;
+      padding: 4px 12px; border-radius: 20px; margin-bottom: 10px;
+    }
+    .app-header h1 { font-size: 1.55rem; font-weight: 800; color: #1e293b; line-height: 1.3; }
+    .app-header p  { margin-top: 8px; color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.05);
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 16px;
+    }
+
+    /* ── Score input ── */
+    .score-wrap { display: flex; align-items: center; gap: 16px; }
+    .score-input {
+      width: 90px; font-size: 2rem; font-weight: 800; text-align: center;
+      border: 2px solid var(--border); border-radius: 10px; padding: 8px;
+      color: var(--text); outline: none; transition: border-color .2s;
+      -moz-appearance: textfield;
+    }
+    .score-input:focus { border-color: #6366f1; }
+    .score-input::-webkit-inner-spin-button,
+    .score-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .score-hint { color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+
+    /* ── Toggle ── */
+    .toggle-group { display: flex; gap: 8px; margin-top: 6px; }
+    .toggle-btn {
+      flex: 1; padding: 10px; border: 2px solid var(--border); background: transparent;
+      border-radius: 10px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      color: var(--muted); transition: all .2s;
+    }
+    .toggle-btn.active-yes { border-color: #ef4444; background: #fef2f2; color: #dc2626; }
+    .toggle-btn.active-no  { border-color: #10b981; background: #ecfdf5; color: #059669; }
+
+    /* ── Rating chips ── */
+    .rating-item { margin-bottom: 18px; }
+    .rating-item:last-child { margin-bottom: 0; }
+    .rating-label {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 8px; font-size: 0.88rem; font-weight: 600;
+    }
+    .rating-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .rating-chips { display: flex; gap: 6px; }
+    .chip {
+      flex: 1; padding: 8px 4px; border: 2px solid var(--border); background: transparent;
+      border-radius: 8px; font-size: 0.82rem; font-weight: 700; color: var(--muted);
+      cursor: pointer; text-align: center; transition: all .15s;
+    }
+    .chip:hover { border-color: #94a3b8; }
+    .chip.selected-vocab     { border-color: var(--vocab);     background: #ede9fe; color: var(--vocab); }
+    .chip.selected-structure { border-color: var(--structure); background: #fce7f3; color: var(--structure); }
+    .chip.selected-logic     { border-color: var(--logic);     background: #fffbeb; color: #b45309; }
+    .chip.selected-speed     { border-color: var(--speed);     background: #ccfbf1; color: #0f766e; }
+    .chip-desc {
+      display: flex; justify-content: space-between;
+      font-size: 0.68rem; color: #94a3b8; margin-top: 4px; padding: 0 2px;
+    }
+
+    /* ── Submit ── */
+    .btn-diagnose {
+      display: block; width: 100%; padding: 16px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff; border: none; border-radius: var(--radius);
+      font-size: 1.05rem; font-weight: 800; letter-spacing: .06em; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(99,102,241,.35); transition: transform .1s, box-shadow .2s;
+      margin-bottom: 28px;
+    }
+    .btn-diagnose:hover  { box-shadow: 0 6px 20px rgba(99,102,241,.45); }
+    .btn-diagnose:active { transform: scale(.98); }
+
+    /* ── Result ── */
+    #result { display: none; }
+
+    /* Hero */
+    .result-hero { text-align: center; padding: 16px 0 12px; }
+    .result-hero .main-weakness {
+      display: inline-block; font-size: 0.8rem; font-weight: 700;
+      padding: 4px 14px; border-radius: 20px; margin-bottom: 8px;
+    }
+    .result-hero h2 { font-size: 1.3rem; font-weight: 800; line-height: 1.4; }
+    .result-hero p  { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
+
+    /* ── Level Banner ── */
+    .level-banner {
+      display: flex; align-items: center; gap: 14px;
+      background: linear-gradient(135deg, #1e293b, #334155);
+      border-radius: var(--radius); padding: 18px 20px; margin-bottom: 16px;
+      color: #fff;
+    }
+    .level-icon { font-size: 2rem; flex-shrink: 0; }
+    .level-label { font-size: 0.72rem; font-weight: 700; opacity: .65; letter-spacing: .08em; margin-bottom: 4px; }
+    .level-name  { font-size: 1.15rem; font-weight: 800; }
+    .level-range { font-size: 0.78rem; opacity: .7; margin-top: 2px; }
+    .level-badge-pill {
+      margin-left: auto; flex-shrink: 0;
+      font-size: 0.72rem; font-weight: 800; padding: 5px 12px;
+      border-radius: 20px; letter-spacing: .04em;
+    }
+
+    /* ── Radar Chart ── */
+    .radar-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 20px;
+    }
+    @media (min-width: 480px) {
+      .radar-wrap { flex-direction: row; align-items: center; }
+    }
+    svg#radar { flex-shrink: 0; }
+    .radar-legend { flex: 1; width: 100%; }
+    .legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .legend-color { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .legend-name  { font-size: 0.82rem; font-weight: 600; flex: 1; }
+    .legend-bar-wrap { flex: 2; height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+    .legend-bar-fill { height: 100%; border-radius: 4px; transition: width .8s ease; }
+    .legend-pct  { font-size: 0.82rem; font-weight: 700; width: 36px; text-align: right; }
+
+    /* ── Priority #1 Hero Card ── */
+    .priority-hero {
+      border-radius: 12px; padding: 20px; margin-bottom: 12px;
+      border: 2px solid; position: relative; overflow: hidden;
+    }
+    .priority-hero::before {
+      content: '優先度 1'; position: absolute; top: 14px; right: 14px;
+      font-size: 0.68rem; font-weight: 800; letter-spacing: .08em;
+      padding: 3px 10px; border-radius: 20px;
+    }
+    .priority-hero-subject {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: .06em;
+      opacity: .75; margin-bottom: 6px;
+    }
+    .priority-hero-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 6px; }
+    .priority-hero-desc  { font-size: 0.84rem; line-height: 1.6; }
+
+    /* ── Priority list (2〜4) ── */
+    .priority-list { list-style: none; }
+    .priority-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 13px 0; border-bottom: 1px solid var(--border);
+    }
+    .priority-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .rank-badge {
+      flex-shrink: 0; width: 30px; height: 30px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.85rem; color: #fff;
+    }
+    .priority-body strong { display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 2px; }
+    .priority-body span   { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+    /* ── Today tasks ── */
+    .task-list { list-style: none; }
+    .task-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem;
+    }
+    .task-item:last-child { border-bottom: none; }
+    .task-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+    }
+    .task-body strong { font-weight: 700; display: block; margin-bottom: 2px; }
+    .task-body span   { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── Textbooks ── */
+    .textbook-section { margin-bottom: 12px; }
+    .textbook-subject {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.78rem; font-weight: 700; letter-spacing: .06em;
+      color: var(--muted); margin-bottom: 8px; padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .textbook-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .textbook-items { display: grid; gap: 7px; }
+    .textbook-item {
+      display: flex; align-items: center; gap: 10px;
+      background: #f8fafc; border-radius: 9px; padding: 10px 12px;
+    }
+    .textbook-rank {
+      flex-shrink: 0; width: 22px; height: 22px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 800; color: #fff;
+    }
+    .textbook-name { font-size: 0.86rem; font-weight: 700; display: block; }
+    .textbook-note { font-size: 0.75rem; color: var(--muted); }
+
+    /* ── 7-day plan ── */
+    .plan-grid { display: grid; gap: 7px; }
+    .plan-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: #f8fafc; border-radius: 10px; padding: 11px 12px;
+    }
+    .plan-day-label {
+      flex-shrink: 0; font-size: 0.7rem; font-weight: 800; color: #fff;
+      padding: 3px 8px; border-radius: 6px; white-space: nowrap;
+    }
+    .plan-body strong { display: block; font-size: 0.84rem; color: var(--text); margin-bottom: 2px; }
+    .plan-body span   { font-size: 0.76rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="app-header">
+      <div class="badge">英語長文読解診断</div>
+      <h1>英語が伸びない原因を<br>構造で特定する</h1>
+      <p>模試・テストの結果を入力するだけで、<br>今日やるべき勉強が1分でわかります。</p>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="card">
+      <div class="card-title">STEP 1 ── 今回の長文の点数</div>
+      <div class="score-wrap">
+        <input type="number" class="score-input" id="score" min="0" max="100" placeholder="--">
+        <div class="score-hint">点数を入力<br>（100点満点に換算）</div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="card">
+      <div class="card-title">STEP 2 ── 時間切れになりましたか？</div>
+      <div class="toggle-group">
+        <button class="toggle-btn" id="to-yes" onclick="setTimeout_('yes')">⏰ はい、時間が足りなかった</button>
+        <button class="toggle-btn" id="to-no"  onclick="setTimeout_('no')">✅ いいえ、時間内に解けた</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="card">
+      <div class="card-title">STEP 3 ── 自己評価（1＝ほぼない、5＝かなり多い）</div>
+
+      <div class="rating-item">
+        <div class="rating-label">
+          <span class="rating-dot" style="background:var(--vocab)"></span>
+          知らない単語が出てきた頻度
+        </div>
+        <div class="rating-chips" id="chips-vocab">
+          <button class="chip" onclick="setRating('vocab',1)">1</button>
+          <button class="chip" onclick="setRating('vocab',2)">2</button>
+          <button class="chip" onclick="setRating('vocab',3)">3</button>
+          <button class="chip" onclick="setRating('vocab',4)">4</button>
+          <button class="chip" onclick="setRating('vocab',5)">5</button>
+        </div>
+        <div class="chip-desc"><span>ほぼない</span><span>かなり多い</span></div>
+      </div>
+
+      <div class="rating-item">
+        <div class="rating-label">
+          <span class="rating-dot" style="background:var(--structure)"></span>
+          文の構造（SVOC）が取れなかった頻度
+        </div>
+        <div class="rating-chips" id="chips-structure">
+          <button class="chip" onclick="setRating('structure',1)">1</button>
+          <button class="chip" onclick="setRating('structure',2)">2</button>
+          <button class="chip" onclick="setRating('structure',3)">3</button>
+          <button class="chip" onclick="setRating('structure',4)">4</button>
+          <button class="chip" onclick="setRating('structure',5)">5</button>
+        </div>
+        <div class="chip-desc"><span>ほぼない</span><span>かなり多い</span></div>
+      </div>
+
+      <div class="rating-item">
+        <div class="rating-label">
+          <span class="rating-dot" style="background:var(--logic)"></span>
+          段落・接続詞の流れが追えなかった頻度
+        </div>
+        <div class="rating-chips" id="chips-logic">
+          <button class="chip" onclick="setRating('logic',1)">1</button>
+          <button class="chip" onclick="setRating('logic',2)">2</button>
+          <button class="chip" onclick="setRating('logic',3)">3</button>
+          <button class="chip" onclick="setRating('logic',4)">4</button>
+          <button class="chip" onclick="setRating('logic',5)">5</button>
+        </div>
+        <div class="chip-desc"><span>ほぼない</span><span>かなり多い</span></div>
+      </div>
+
+      <div class="rating-item">
+        <div class="rating-label">
+          <span class="rating-dot" style="background:var(--speed)"></span>
+          読むスピードが遅いと感じた程度
+        </div>
+        <div class="rating-chips" id="chips-speed">
+          <button class="chip" onclick="setRating('speed',1)">1</button>
+          <button class="chip" onclick="setRating('speed',2)">2</button>
+          <button class="chip" onclick="setRating('speed',3)">3</button>
+          <button class="chip" onclick="setRating('speed',4)">4</button>
+          <button class="chip" onclick="setRating('speed',5)">5</button>
+        </div>
+        <div class="chip-desc"><span>ほぼない</span><span>かなり多い</span></div>
+      </div>
+    </div>
+
+    <button class="btn-diagnose" onclick="diagnose()">🔍 弱点を診断する</button>
+
+    <!-- Result -->
+    <div id="result">
+
+      <!-- Hero -->
+      <div class="result-hero">
+        <div class="main-weakness" id="hero-badge"></div>
+        <h2 id="hero-title"></h2>
+        <p id="hero-sub"></p>
+      </div>
+
+      <!-- Level Banner -->
+      <div class="level-banner" id="level-banner">
+        <div class="level-icon" id="level-icon"></div>
+        <div>
+          <div class="level-label">現在のレベル判定</div>
+          <div class="level-name"  id="level-name"></div>
+          <div class="level-range" id="level-range"></div>
+        </div>
+        <div class="level-badge-pill" id="level-pill"></div>
+      </div>
+
+      <!-- Radar -->
+      <div class="card">
+        <div class="card-title">読解力の弱点マップ</div>
+        <div class="radar-wrap">
+          <svg id="radar" width="200" height="200" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+            <circle cx="100" cy="100" r="60" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+            <circle cx="100" cy="100" r="40" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+            <circle cx="100" cy="100" r="20" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+            <line x1="100" y1="100" x2="100" y2="20"  stroke="#cbd5e1" stroke-width="1"/>
+            <line x1="100" y1="100" x2="180" y2="100" stroke="#cbd5e1" stroke-width="1"/>
+            <line x1="100" y1="100" x2="100" y2="180" stroke="#cbd5e1" stroke-width="1"/>
+            <line x1="100" y1="100" x2="20"  y2="100" stroke="#cbd5e1" stroke-width="1"/>
+            <polygon id="radar-poly" points="" fill="rgba(99,102,241,0.15)" stroke="#6366f1" stroke-width="2"/>
+            <text x="100" y="12"  text-anchor="middle" font-size="11" font-weight="700" fill="#6366f1">語彙</text>
+            <text x="192" y="104" text-anchor="start"  font-size="11" font-weight="700" fill="#ec4899">構文</text>
+            <text x="100" y="197" text-anchor="middle" font-size="11" font-weight="700" fill="#14b8a6">速度</text>
+            <text x="8"   y="104" text-anchor="start"  font-size="11" font-weight="700" fill="#f59e0b">論理</text>
+          </svg>
+          <div class="radar-legend" id="radar-legend"></div>
+        </div>
+      </div>
+
+      <!-- Priority #1 Hero -->
+      <div class="priority-hero" id="priority-hero"></div>
+
+      <!-- Priority 2–4 -->
+      <div class="card">
+        <div class="card-title">改善優先順位（2〜4位）</div>
+        <ul class="priority-list" id="priority-list"></ul>
+      </div>
+
+      <!-- Today's tasks -->
+      <div class="card">
+        <div class="card-title">今日やるべき具体タスク</div>
+        <ul class="task-list" id="task-list"></ul>
+      </div>
+
+      <!-- Textbooks -->
+      <div class="card">
+        <div class="card-title">おすすめ参考書（レベル別）</div>
+        <div id="textbook-list"></div>
+      </div>
+
+      <!-- 7-day plan -->
+      <div class="card">
+        <div class="card-title">7日間改善プラン</div>
+        <div class="plan-grid" id="plan-grid"></div>
+      </div>
+
+    </div><!-- /#result -->
+  </div><!-- /.container -->
+
+  <script>
+    /* ═══════════════════════════════════════════
+       Data
+    ═══════════════════════════════════════════ */
+    const SUBJECTS = [
+      { key: 'vocab',     name: '語彙', color: '#6366f1', axis: [100, 20]  },
+      { key: 'structure', name: '構文', color: '#ec4899', axis: [180, 100] },
+      { key: 'speed',     name: '速度', color: '#14b8a6', axis: [100, 180] },
+      { key: 'logic',     name: '論理', color: '#f59e0b', axis: [20, 100]  },
+    ];
+
+    const LEVELS = {
+      basic:    { name: '基礎レベル', range: '偏差値 40〜50 相当', icon: '📗', pill: '基礎', pillBg: '#dcfce7', pillColor: '#166534' },
+      standard: { name: '標準レベル', range: '偏差値 50〜60 相当', icon: '📘', pill: '標準', pillBg: '#dbeafe', pillColor: '#1e40af' },
+      advanced: { name: '応用レベル', range: '偏差値 60〜70 相当', icon: '📙', pill: '応用', pillBg: '#fef9c3', pillColor: '#854d0e' },
+    };
+
+    /* Textbooks: weakness × level → [{name, note}] */
+    const TEXTBOOKS = {
+      vocab: {
+        basic:    [
+          { name: 'ターゲット1900（1〜500番）', note: '最頻出語から確実に。赤シート暗記で定着させる' },
+          { name: 'シス単 Basic',               note: '語彙が弱い段階での最適な入門書。例文ごと覚える' },
+        ],
+        standard: [
+          { name: 'システム英単語（1〜1200番）', note: '1000語突破を目標に。ミニマルペアを活用する' },
+          { name: 'ターゲット1900（全範囲）',     note: '頻出語を速習し、文脈での意味把握を意識する' },
+        ],
+        advanced: [
+          { name: '鉄壁',                         note: '語根・接頭辞から体系的に語彙を拡張する' },
+          { name: 'システム英単語（1200番〜）',    note: '高難度語・多義語・派生語まで徹底的に仕上げる' },
+        ],
+      },
+      structure: {
+        basic:    [
+          { name: '入門英文解釈の技術70',          note: 'SVOCの基礎から丁寧に。解析の型を最初に身につける' },
+          { name: '大岩のいちばんはじめの英文法',  note: '文法の根拠を理解してから構文に進む' },
+        ],
+        standard: [
+          { name: '基礎英文解釈の技術100',         note: '標準的な難構文を100題で完全攻略する' },
+          { name: '入門英文解釈の技術70',          note: '短期間で構文把握の精度を上げたい場合に最適' },
+        ],
+        advanced: [
+          { name: 'ポレポレ英文読解プロセス50',    note: '難関大の複雑な構文を思考プロセスごと習得する' },
+          { name: '英文読解の透視図',              note: '最高難度の構文を体系的に攻略する上級書' },
+        ],
+      },
+      logic: {
+        basic:    [
+          { name: 'ハイパートレーニング①（超基礎）', note: '短い英文で論理の流れを掴む感覚を養う' },
+          { name: 'パラグラフリーディングのストラテジー①', note: '段落単位の読み方を基礎から訓練する' },
+        ],
+        standard: [
+          { name: 'やっておきたい英語長文300',      note: '300語レベルで論理展開の追い方を実践する' },
+          { name: 'パラグラフリーディングのストラテジー②', note: '接続詞・論理マーカーの機能を体系的に理解する' },
+        ],
+        advanced: [
+          { name: 'やっておきたい英語長文500',      note: '論理が複雑な長文で段落関係を正確に把握する' },
+          { name: '英語長文問題精講',               note: '難関大レベルの論理読解・設問解法を完成させる' },
+        ],
+      },
+      speed: {
+        basic:    [
+          { name: 'ハイパートレーニング①（音読用）', note: '既読の易しい英文を毎日5回音読してリズムを作る' },
+          { name: 'DUO 3.0（例文音読）',            note: '短い例文で英語のチャンキングを体で覚える' },
+        ],
+        standard: [
+          { name: 'やっておきたい英語長文300（速読）', note: '時間を計りながら読み、徐々に速度を上げる' },
+          { name: 'ハイパートレーニング②',           note: '音読とスラッシュ読みを組み合わせて訓練する' },
+        ],
+        advanced: [
+          { name: 'やっておきたい英語長文500',        note: '500語を制限時間内で読み切る実戦訓練' },
+          { name: 'パラグラフリーディングのストラテジー③', note: 'スキミング・スキャニングを高速化する' },
+        ],
+      },
+    };
+
+    /* Today's tasks: weakness × level → [{icon, title, desc}] */
+    const TODAY_TASKS = {
+      vocab: {
+        basic: [
+          { icon: '📖', title: 'ターゲット1900 50語復習（1〜500番）', desc: '赤シートで隠しながら3回転。分からない語に印をつける' },
+          { icon: '✏️', title: 'シス単Basic 確認テスト（20問）',       desc: '前日分をミニテスト形式で素早くチェック' },
+        ],
+        standard: [
+          { icon: '📖', title: 'システム英単語 50語（1001〜1200番）',   desc: '例文ごと暗記。ミニマルペアを比較しながら定着させる' },
+          { icon: '✏️', title: '語彙推測問題 10問',                     desc: '文脈から意味を推測する実戦型問題を解く' },
+        ],
+        advanced: [
+          { icon: '📖', title: '鉄壁 30語精習',                         desc: '語根・接頭辞から派生語まで芋づる式に覚える' },
+          { icon: '✏️', title: '多義語・難語の文脈確認（10語）',         desc: '1語複数の意味を文脈で使い分ける練習' },
+        ],
+      },
+      structure: {
+        basic: [
+          { icon: '🔍', title: '入門英文解釈の技術70 例題3問',           desc: 'SVOCを図示しながら解析。答え合わせで構文の型を確認' },
+          { icon: '📝', title: 'SVOC振り分け練習（5文）',                 desc: '教科書例文に品詞・文型を書き込む基礎トレーニング' },
+        ],
+        standard: [
+          { icon: '🔍', title: '基礎英文解釈の技術100 例題3問',           desc: '関係詞・分詞構文・比較構文を中心に解析する' },
+          { icon: '📝', title: '構文問題演習（5題）',                      desc: '難構文を含む短文を制限時間で解く' },
+        ],
+        advanced: [
+          { icon: '🔍', title: 'ポレポレ 例題3問',                        desc: '解答プロセスを声に出しながら思考の流れを確認する' },
+          { icon: '📝', title: '難構文分析（長文から3文抽出）',            desc: '過去問の難解文を選び、解釈を書き起こす' },
+        ],
+      },
+      logic: {
+        basic: [
+          { icon: '🧩', title: '論理マーカー15語を整理',                  desc: 'however / therefore / for example を逆接・順接・例示に分類' },
+          { icon: '📋', title: 'ハイパートレーニング① 段落要約（2題）',   desc: 'トピックセンテンスを特定し、段落をひとことで要約する' },
+        ],
+        standard: [
+          { icon: '🧩', title: '接続詞・論理マーカー20語の確認',           desc: 'in contrast / consequently など強調・対比系を重点的に' },
+          { icon: '📋', title: 'やっておきたい300 段落要約（1題）',        desc: '第1段落と最終段落から筆者の主張を先に掴む練習' },
+        ],
+        advanced: [
+          { icon: '🧩', title: 'ディスコースマーカー総確認（30語）',       desc: '論理関係をすばやく分類できるスピードを磨く' },
+          { icon: '📋', title: 'やっておきたい500 論理構造図示（1題）',    desc: '段落ごとの役割を矢印・記号で可視化してから設問を解く' },
+        ],
+      },
+      speed: {
+        basic: [
+          { icon: '⏱️', title: 'ハイパートレーニング① 音読（1題×5回）',  desc: '目標：詰まらずに1分で読み切る。毎日継続が最重要' },
+          { icon: '🎧', title: 'スラッシュリーディング入門（3文）',        desc: '意味のまとまりでスラッシュを入れ、前から意味を取る練習' },
+        ],
+        standard: [
+          { icon: '⏱️', title: 'やっておきたい300 タイムアタック（1題）', desc: '目標：150wpm。タイマーで計測し、毎回記録をつける' },
+          { icon: '🎧', title: '音読練習（既読英文×5回）',                 desc: 'スラスラ読めるまで繰り返す。止まった箇所を記録する' },
+        ],
+        advanced: [
+          { icon: '⏱️', title: 'やっておきたい500 時間計測（1題）',       desc: '目標：180wpm。本番同様のタイムで解き、スピードと精度を両立する' },
+          { icon: '🎧', title: 'スキミング練習（長文1題）',                desc: '第1・最終段落を読み、残りは各段落の最初の1文だけで要旨を掴む' },
+        ],
+      },
+    };
+
+    /* Priority hero comments */
+    const HERO_COMMENTS = {
+      vocab: {
+        basic:    '知らない単語が多く、文章の意味が取れていない状態です。まず頻出語1000語を固めることが最優先。語彙が土台になります。',
+        standard: '単語の漏れが失点の直接原因になっています。1200語レベルを固め、文脈推測力も同時に鍛えましょう。',
+        advanced: '高難度語・多義語での失点が見られます。語根学習で語彙を体系化し、一語から複数語を派生させる力を磨きましょう。',
+      },
+      structure: {
+        basic:    '文の骨格（SVOC）が取れないと内容理解は不可能です。まず入門英文解釈で構文把握の型を身につけましょう。',
+        standard: '標準〜難度の構文でつまずいています。英文解釈の技術で100題を完走し、構文把握を反射的にできるまで鍛えます。',
+        advanced: '複雑な構文の処理が遅く、読解スピードを落とす原因になっています。ポレポレで思考プロセスを完成させましょう。',
+      },
+      logic: {
+        basic:    '段落の流れが追えていないため、文章全体の意味が掴めていません。接続詞・論理マーカーの機能を意識した読み方を学びましょう。',
+        standard: '設問に必要な論理的根拠を素早く見つけられていません。パラグラフリーディングの型を習得し、情報の優先度を判断する力を鍛えます。',
+        advanced: '長い文章で論理構造が複雑になると追いきれなくなっています。段落関係の図示を習慣化して、全体構造を瞬時に把握する力を磨きましょう。',
+      },
+      speed: {
+        basic:    '処理速度が根本的に不足しています。まず音読で英語を「前から意味を取る」感覚を作ることが先決です。',
+        standard: '読む速度が遅く、時間内に解き終われていません。タイムアタック演習を毎日続け、150wpmを目標にしましょう。',
+        advanced: '高難度問題で時間を使いすぎています。スキミング・スキャニングを使いこなし、180wpmで安定して読める状態を目指します。',
+      },
+    };
+
+    /* ═══════════════════════════════════════════
+       State
+    ═══════════════════════════════════════════ */
+    const ratings    = { vocab: 0, structure: 0, logic: 0, speed: 0 };
+    let   timeoutVal = null;
+
+    /* ═══════════════════════════════════════════
+       UI helpers
+    ═══════════════════════════════════════════ */
+    function setTimeout_(val) {
+      timeoutVal = val;
+      document.getElementById('to-yes').className = 'toggle-btn' + (val === 'yes' ? ' active-yes' : '');
+      document.getElementById('to-no').className  = 'toggle-btn' + (val === 'no'  ? ' active-no'  : '');
+    }
+
+    function setRating(key, val) {
+      ratings[key] = val;
+      document.querySelectorAll(`#chips-${key} .chip`).forEach((c, i) => {
+        c.className = 'chip' + (i < val ? ` selected-${key}` : '');
+      });
+    }
+
+    /* ═══════════════════════════════════════════
+       Level determination
+    ═══════════════════════════════════════════ */
+    function getLevel(score, ratings) {
+      const avgRating = (ratings.vocab + ratings.structure + ratings.logic + ratings.speed) / 4;
+      // High self-reported difficulty adjusts effective score downward
+      const adjusted = score - (avgRating - 3) * 4;
+      if (adjusted < 50) return 'basic';
+      if (adjusted < 68) return 'standard';
+      return 'advanced';
+    }
+
+    /* ═══════════════════════════════════════════
+       Main diagnosis
+    ═══════════════════════════════════════════ */
+    function diagnose() {
+      const score = parseInt(document.getElementById('score').value);
+      if (isNaN(score) || score < 0 || score > 100) { alert('点数を0〜100で入力してください。'); return; }
+      if (timeoutVal === null) { alert('時間切れかどうかを選択してください。'); return; }
+      for (const k of ['vocab','structure','logic','speed']) {
+        if (ratings[k] === 0) { alert('自己評価をすべて選択してください。'); return; }
+      }
+
+      /* ── Weakness raw scores ── */
+      const raw = {
+        vocab:     ratings.vocab     * 20,
+        structure: ratings.structure * 20,
+        logic:     ratings.logic     * 20,
+        speed:     ratings.speed     * 20,
+      };
+      if (timeoutVal === 'yes') raw.speed = Math.min(100, raw.speed + 30);
+      const amp = score < 40 ? 1.3 : score < 60 ? 1.15 : score < 75 ? 1.0 : 0.85;
+      for (const k in raw) raw[k] = Math.min(100, raw[k] * amp);
+
+      const total = Object.values(raw).reduce((a, b) => a + b, 0);
+      const pct   = {};
+      for (const k in raw) pct[k] = Math.round((raw[k] / total) * 100);
+
+      const sorted = [...SUBJECTS].sort((a, b) => raw[b.key] - raw[a.key]);
+      const top    = sorted[0];
+      const level  = getLevel(score, ratings);
+      const lv     = LEVELS[level];
+
+      /* ── Hero ── */
+      const heroTitles = {
+        vocab:     '語彙不足が最大の壁',
+        structure: '構文理解が最大の課題',
+        logic:     '論理構造の把握が最重要',
+        speed:     '処理速度の改善が最優先',
+      };
+      const badge = document.getElementById('hero-badge');
+      badge.textContent       = `最重要弱点：${top.name}`;
+      badge.style.background  = top.color + '22';
+      badge.style.color       = top.color;
+      document.getElementById('hero-title').textContent = heroTitles[top.key];
+      document.getElementById('hero-sub').textContent   =
+        `得点：${score}点 ／ レベル判定：${lv.name}`;
+
+      /* ── Level Banner ── */
+      document.getElementById('level-icon').textContent  = lv.icon;
+      document.getElementById('level-name').textContent  = lv.name;
+      document.getElementById('level-range').textContent = lv.range;
+      const pill = document.getElementById('level-pill');
+      pill.textContent        = lv.pill;
+      pill.style.background   = lv.pillBg;
+      pill.style.color        = lv.pillColor;
+
+      /* ── Radar ── */
+      const cx = 100, cy = 100, maxR = 80;
+      const polyPts = SUBJECTS.map(s => {
+        const r = (raw[s.key] / 100) * maxR;
+        return `${cx + r * (s.axis[0] - cx) / maxR},${cy + r * (s.axis[1] - cy) / maxR}`;
+      }).join(' ');
+      const poly = document.getElementById('radar-poly');
+      poly.setAttribute('points', polyPts);
+      poly.style.stroke = top.color;
+      poly.style.fill   = top.color + '22';
+
+      /* ── Legend bars ── */
+      document.getElementById('radar-legend').innerHTML = SUBJECTS.map(s => `
+        <div class="legend-row">
+          <div class="legend-color" style="background:${s.color}"></div>
+          <div class="legend-name">${s.name}</div>
+          <div class="legend-bar-wrap">
+            <div class="legend-bar-fill" style="width:${pct[s.key]}%;background:${s.color}"></div>
+          </div>
+          <div class="legend-pct" style="color:${s.color}">${pct[s.key]}%</div>
+        </div>`).join('');
+
+      /* ── Priority #1 Hero card ── */
+      const heroCard = document.getElementById('priority-hero');
+      heroCard.style.borderColor  = top.color;
+      heroCard.style.background   = top.color + '0d';
+      heroCard.style.setProperty('color', top.color);
+      heroCard.querySelector('::before'); // reflow
+      heroCard.innerHTML = `
+        <div style="position:absolute;top:14px;right:14px;font-size:.68rem;font-weight:800;letter-spacing:.08em;
+             padding:3px 10px;border-radius:20px;background:${top.color};color:#fff;">優先度 1</div>
+        <div class="priority-hero-subject" style="color:${top.color}">${top.name}強化</div>
+        <div class="priority-hero-title" style="color:#1e293b">${heroTitles[top.key]}</div>
+        <div class="priority-hero-desc"  style="color:#475569">${HERO_COMMENTS[top.key][level]}</div>`;
+
+      /* ── Priority 2–4 ── */
+      document.getElementById('priority-list').innerHTML = sorted.slice(1).map((s, i) => {
+        const comments = {
+          vocab:     r => r >= 4 ? '語彙が読めない＝意味が取れない。頻出語から補強を。' : '単語の漏れが失点の原因。頻出語を先に固めましょう。',
+          structure: r => r >= 4 ? '文構造が取れず、内容理解が止まっています。' : '複雑な文での構文ミスが見られます。英文解釈で精度を上げましょう。',
+          logic:     r => r >= 4 ? '段落間の論理が追えていない状態です。' : '接続詞への意識を高めると得点が安定します。',
+          speed:     r => r >= 4 ? '処理速度が全体の足を引っ張っています。音読から始めましょう。' : '速度をやや上げると時間管理が改善されます。',
+        };
+        return `
+          <li class="priority-item">
+            <div class="rank-badge" style="background:${s.color}">${i + 2}</div>
+            <div class="priority-body">
+              <strong>${s.name}（弱点スコア：${pct[s.key]}%）</strong>
+              <span>${comments[s.key](ratings[s.key])}</span>
+            </div>
+          </li>`;
+      }).join('');
+
+      /* ── Today's tasks ── */
+      const topTasks  = TODAY_TASKS[top.key][level];
+      const top2Tasks = TODAY_TASKS[sorted[1].key][level];
+      const allTasks  = [
+        ...topTasks,
+        top2Tasks[0],
+        {
+          icon: '📄',
+          title: `長文通し読み（1題）${timeoutVal === 'yes' ? '・時間計測あり' : ''}`,
+          desc:  '今日学習した観点を意識しながら本番形式で読む',
+        },
+      ];
+      document.getElementById('task-list').innerHTML = allTasks.map(t => `
+        <li class="task-item">
+          <div class="task-icon" style="background:${top.color}22">${t.icon}</div>
+          <div class="task-body">
+            <strong>${t.title}</strong>
+            <span>${t.desc}</span>
+          </div>
+        </li>`).join('');
+
+      /* ── Textbooks ── */
+      // Show top 2 weaknesses
+      const tbSubjects = sorted.slice(0, 2);
+      document.getElementById('textbook-list').innerHTML = tbSubjects.map((s, si) => {
+        const books = TEXTBOOKS[s.key][level];
+        return `
+          <div class="textbook-section" style="${si > 0 ? 'margin-top:16px;padding-top:16px;border-top:1px solid var(--border)' : ''}">
+            <div class="textbook-subject">
+              <span class="textbook-dot" style="background:${s.color}"></span>
+              ${s.name}強化（${lv.pill}レベル）
+            </div>
+            <div class="textbook-items">
+              ${books.map((b, bi) => `
+                <div class="textbook-item">
+                  <div class="textbook-rank" style="background:${s.color}">${bi + 1}</div>
+                  <div>
+                    <span class="textbook-name">${b.name}</span>
+                    <span class="textbook-note">${b.note}</span>
+                  </div>
+                </div>`).join('')}
+            </div>
+          </div>`;
+      }).join('');
+
+      /* ── 7-day plan ── */
+      const top2 = sorted[1];
+      const PLANS = {
+        vocab: [
+          { day: 'Day 1', color: top.color,  title: `単語基礎固め（${level==='basic'?'ターゲット50語':level==='standard'?'シス単50語':'鉄壁30語'}）`,  desc: '未知語をリストアップ。語根グループで整理する' },
+          { day: 'Day 2', color: top.color,  title: 'Day1の確認テスト＋語彙問題演習',  desc: '自己テストで定着確認。文脈型問題10問に挑戦' },
+          { day: 'Day 3', color: top2.color, title: `${top2.name}の集中演習`,          desc: '第2弱点を補強。基礎問題から標準問題へ段階的に進む' },
+          { day: 'Day 4', color: top.color,  title: '単語継続（50語）＋短文読解',      desc: '語彙を文脈で使う練習。精読で定着を確認' },
+          { day: 'Day 5', color: '#475569',  title: '長文読解（語彙に注目）',           desc: '未知語をゼロにした状態で読み直す体験を積む' },
+          { day: 'Day 6', color: top2.color, title: `${top2.name}の応用演習`,          desc: '標準〜発展レベルの問題で実力を試す' },
+          { day: 'Day 7', color: '#7c3aed',  title: '模試形式・総まとめ',               desc: '時間計測しながら長文1題。全弱点の進捗を確認する' },
+        ],
+        structure: [
+          { day: 'Day 1', color: top.color,  title: `SVOC解析（${level==='basic'?'入門70':level==='standard'?'基礎100':'ポレポレ'} 例題3問）`, desc: '品詞・文型を図示しながら解析する基礎トレーニング' },
+          { day: 'Day 2', color: top.color,  title: '難構文精読（関係詞・分詞・倒置）',  desc: '3文を丁寧に解析し、構文把握の型を固める' },
+          { day: 'Day 3', color: top2.color, title: `${top2.name}の基礎補強`,            desc: '第2弱点に取り組み、バランスよく改善を進める' },
+          { day: 'Day 4', color: top.color,  title: '構文を意識した短文読解（5題）',     desc: '各文のSVを明示してから意味を取る練習' },
+          { day: 'Day 5', color: '#475569',  title: '長文読解（構文意識）',               desc: '難解文に出会ったら立ち止まって解析する習慣を作る' },
+          { day: 'Day 6', color: top2.color, title: `${top2.name}の応用問題`,            desc: '実戦形式の問題で弱点が残っていないか確認する' },
+          { day: 'Day 7', color: '#7c3aed',  title: '模試形式・総まとめ',                desc: '通し読みして正確に内容が取れているか検証する' },
+        ],
+        logic: [
+          { day: 'Day 1', color: top.color,  title: '論理マーカー20語を整理',            desc: '逆接・順接・例示・強調のグループに分けて暗記する' },
+          { day: 'Day 2', color: top.color,  title: '段落要約練習（3段落）',              desc: 'トピックセンテンスを特定し、段落を1文で要約する' },
+          { day: 'Day 3', color: top2.color, title: `${top2.name}の集中練習`,            desc: '第2弱点を並行して補強する' },
+          { day: 'Day 4', color: top.color,  title: 'パラグラフリーディング演習',         desc: '第1段落→最終段落→残りの順で読む戦略を練習する' },
+          { day: 'Day 5', color: '#475569',  title: '論理追跡しながら長文読解',           desc: '接続詞に下線を引きながら読み、論理の流れを図示する' },
+          { day: 'Day 6', color: top2.color, title: `${top2.name}の応用問題`,            desc: '要旨把握・内容一致問題で得点できるか確認' },
+          { day: 'Day 7', color: '#7c3aed',  title: '模試形式・総まとめ',                desc: '全体の論理展開を意識して長文1題を通読する' },
+        ],
+        speed: [
+          { day: 'Day 1', color: top.color,  title: '音読練習（既読文×5回）',            desc: 'スラスラ読めるまで繰り返す。リズムで英語を処理する感覚を作る' },
+          { day: 'Day 2', color: top.color,  title: 'スラッシュリーディング入門',         desc: '意味のまとまりでスラッシュを入れ、前から意味を取る練習' },
+          { day: 'Day 3', color: top2.color, title: `${top2.name}の補強`,                desc: '速度を落とす原因になっている弱点を並行して改善する' },
+          { day: 'Day 4', color: top.color,  title: `タイムアタック読解（${level==='basic'?'易しい英文':'標準英文'}）`, desc: '目標：150wpm。ストップウォッチで計測しながら読む' },
+          { day: 'Day 5', color: '#475569',  title: '時間制限つき長文読解',               desc: '本番と同じ制限時間で解き、タイムマネジメントを練習する' },
+          { day: 'Day 6', color: top2.color, title: `${top2.name}の応用演習`,            desc: '速度とともに精度も上がっているか確認する' },
+          { day: 'Day 7', color: '#7c3aed',  title: '模試形式・総仕上げ',                desc: '時間計測しながら長文1題。今週の成長を確認する' },
+        ],
+      };
+
+      document.getElementById('plan-grid').innerHTML = PLANS[top.key].map(d => `
+        <div class="plan-row">
+          <span class="plan-day-label" style="background:${d.color}">${d.day}</span>
+          <div class="plan-body">
+            <strong>${d.title}</strong>
+            <span>${d.desc}</span>
+          </div>
+        </div>`).join('');
+
+      /* ── Show ── */
+      const res = document.getElementById('result');
+      res.style.display = 'block';
+      res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  </script>
+</body>
+</html>
