@@ -252,9 +252,17 @@
       <p>模試・テストの結果を入力するだけで、<br>今日やるべき勉強が1分でわかります。</p>
     </div>
 
+    <!-- Step 0 -->
+    <div class="card">
+      <div class="card-title">STEP 1 ── あなたの名前（LINEの名前でOK）</div>
+      <div class="score-wrap">
+        <input type="text" id="username" placeholder="例：田中花子" style="flex:1;font-size:1.2rem;font-weight:700;border:2px solid var(--border);border-radius:10px;padding:10px 14px;outline:none;transition:border-color .2s;" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='var(--border)'">
+      </div>
+    </div>
+
     <!-- Step 1 -->
     <div class="card">
-      <div class="card-title">STEP 1 ── 今回の長文の点数</div>
+      <div class="card-title">STEP 2 ── 今回の長文の点数</div>
       <div class="score-wrap">
         <input type="number" class="score-input" id="score" min="0" max="100" placeholder="--">
         <div class="score-hint">点数を入力<br>（100点満点に換算）</div>
@@ -263,7 +271,7 @@
 
     <!-- Step 2 -->
     <div class="card">
-      <div class="card-title">STEP 2 ── 時間切れになりましたか？</div>
+      <div class="card-title">STEP 3 ── 時間切れになりましたか？</div>
       <div class="toggle-group">
         <button class="toggle-btn" id="to-yes" onclick="setTimeout_('yes')">⏰ はい、時間が足りなかった</button>
         <button class="toggle-btn" id="to-no"  onclick="setTimeout_('no')">✅ いいえ、時間内に解けた</button>
@@ -272,7 +280,7 @@
 
     <!-- Step 3 -->
     <div class="card">
-      <div class="card-title">STEP 3 ── 自己評価（1＝ほぼない、5＝かなり多い）</div>
+      <div class="card-title">STEP 4 ── 自己評価（1＝ほぼない、5＝かなり多い）</div>
 
       <div class="rating-item">
         <div class="rating-label">
@@ -553,24 +561,24 @@
     /* Priority hero comments */
     const HERO_COMMENTS = {
       vocab: {
-        basic:    '知らない単語が多く、文章の意味が取れていない状態です。まず頻出語1000語を固めることが最優先。語彙が土台になります。',
-        standard: '単語の漏れが失点の直接原因になっています。1200語レベルを固め、文脈推測力も同時に鍛えましょう。',
-        advanced: '高難度語・多義語での失点が見られます。語根学習で語彙を体系化し、一語から複数語を派生させる力を磨きましょう。',
+        basic:    'はっきり言います。今の状態では語彙が足りなすぎて、読解テクニックを使う以前の問題です。ターゲット1900の1〜500番だけに今すぐ集中してください。1日50語、10日で500語が目標です。「なんとなく知ってる」では絶対ダメです。意味を見た瞬間に日本語が口をついて出るくらいまで繰り返してください。500語固まるまでは長文演習より単語が先です。',
+        standard: '語彙の穴が得点に直結しています。システム英単語の1001番以降が特に危ない状態です。1日50語ペースで進めながら、単語を「覚えた・覚えていない」ではなく「文脈の中で意味が瞬時に出るか」で判断してください。推測で乗り切ろうとする癖もここで直しましょう。正確に知っている語を増やすことが今の最短ルートです。',
+        advanced: '高難度語と多義語での失点が目立ちます。鉄壁を使って語根・接頭辞から体系的に覚えてください。1語ずつ暗記するのではなく、1つの語根から10語を派生させる勉強法に切り替えることで効率が3倍変わります。また、同じ単語でも文脈によって意味が変わるケースを意識的に練習してください。',
       },
       structure: {
-        basic:    '文の骨格（SVOC）が取れないと内容理解は不可能です。まず入門英文解釈で構文把握の型を身につけましょう。',
-        standard: '標準〜難度の構文でつまずいています。英文解釈の技術で100題を完走し、構文把握を反射的にできるまで鍛えます。',
-        advanced: '複雑な構文の処理が遅く、読解スピードを落とす原因になっています。ポレポレで思考プロセスを完成させましょう。',
+        basic:    '文の構造が取れていないと、単語が分かっても意味が組み立てられません。今すぐ「入門英文解釈の技術70」を開いて、1文ずつSVOCを紙に書き出す練習を始めてください。最初はゆっくりで構いません。「なんとなく読んで意味を推測する」クセを今日から捨てて、必ず構造を確認してから意味を取る習慣に変えましょう。これをやるだけで1ヶ月後に別人のような読み方ができます。',
+        standard: '標準的な難構文でつまずいています。関係詞・分詞構文・比較構文あたりでブレーキがかかっているはずです。「基礎英文解釈の技術100」を1日3題ペースで進めてください。解いたあと必ず解説と自分の解釈を照合して、ズレた箇所を言語化することが重要です。「なんとなく合っていた」は実力ではありません。根拠を持って解釈できるようになることが目標です。',
+        advanced: '難構文の処理が遅く、読解全体のスピードを落としています。ポレポレを使って、複雑な文を見た瞬間に解析の手順が自動で動くまで鍛えてください。例題を解くときは必ず声に出して思考プロセスを説明してください。黙って解くだけでは定着しません。難関大の問題では構文把握が0.5秒の差を生みます。',
       },
       logic: {
-        basic:    '段落の流れが追えていないため、文章全体の意味が掴めていません。接続詞・論理マーカーの機能を意識した読み方を学びましょう。',
-        standard: '設問に必要な論理的根拠を素早く見つけられていません。パラグラフリーディングの型を習得し、情報の優先度を判断する力を鍛えます。',
-        advanced: '長い文章で論理構造が複雑になると追いきれなくなっています。段落関係の図示を習慣化して、全体構造を瞬時に把握する力を磨きましょう。',
+        basic:    '単語や文の意味は取れていても、段落のつながりが読めていないため全体像が掴めていません。まず「however・therefore・for example」の3語だけを完璧に使いこなせるようにしてください。これだけで論理の流れが見えてきます。次に各段落を読んだら必ず「この段落は何を言っているか」を一言でまとめる癖をつけてください。それをやるだけで設問の正答率が大きく変わります。',
+        standard: '論理的な根拠を素早く見つける力が不足しています。問題を解くとき、まず第1段落と最終段落を読んで筆者の主張を掴んでから本文に入る習慣をつけてください。そうするだけで「どこに何が書いてあるか」の見当がつきます。パラグラフリーディングのストラテジー②を使って、接続詞の種類ごとに段落の役割を判断する練習を積んでください。',
+        advanced: '長文の論理構造が複雑になると追いきれなくなっています。読みながら段落ごとの役割（主張・根拠・反論・例示）を余白に記号でメモする習慣をつけてください。やっておきたい500の問題で毎回これをやることで、1000語超の文章でも全体構造を瞬時に把握できるようになります。今の状態からあと一段階上に行くにはこのスキルが必須です。',
       },
       speed: {
-        basic:    '処理速度が根本的に不足しています。まず音読で英語を「前から意味を取る」感覚を作ることが先決です。',
-        standard: '読む速度が遅く、時間内に解き終われていません。タイムアタック演習を毎日続け、150wpmを目標にしましょう。',
-        advanced: '高難度問題で時間を使いすぎています。スキミング・スキャニングを使いこなし、180wpmで安定して読める状態を目指します。',
+        basic:    '英語を「日本語に変換してから理解する」読み方をしているため遅くなっています。今日から1つの英文を5回連続で音読してください。毎日10分でいいです。最初はゆっくりでOK。とにかく英語の語順のまま意味を前から取る感覚を体に染み込ませることが先決です。これを2週間続けるだけで速度が体感できるほど変わります。音読なしで速読は絶対にできません。',
+        standard: '読む速度が遅く、時間配分が崩れています。まずストップウォッチを使ってやっておきたい300を1題解くたびに時間を記録してください。目標は150wpm（300語なら2分以内）です。記録をつけることで自分の速度が可視化され、意識が変わります。速度が上がらない原因は「戻り読み」です。一度前から読んだら絶対に戻らないルールを自分に課してください。',
+        advanced: '高難度問題で必要以上に時間を使いすぎています。スキミングとスキャニングを使い分けてください。設問を先に確認してから本文を読む習慣を今日から始めて、探すべき情報を絞って読む訓練を積んでください。やっておきたい500を使って毎回180wpmを目標に計測しながら解くことで、速度と精度を同時に鍛えられます。',
       },
     };
 
@@ -612,6 +620,8 @@
        Main diagnosis
     ═══════════════════════════════════════════ */
     function diagnose() {
+      const username = document.getElementById('username').value.trim();
+      if (!username) { alert('名前を入力してください。'); return; }
       const score = parseInt(document.getElementById('score').value);
       if (isNaN(score) || score < 0 || score > 100) { alert('点数を0〜100で入力してください。'); return; }
       if (timeoutVal === null) { alert('時間切れかどうかを選択してください。'); return; }
@@ -650,7 +660,7 @@
       badge.textContent       = `最重要弱点：${top.name}`;
       badge.style.background  = top.color + '22';
       badge.style.color       = top.color;
-      document.getElementById('hero-title').textContent = heroTitles[top.key];
+      document.getElementById('hero-title').textContent = `${username}さん、${heroTitles[top.key]}`;
       document.getElementById('hero-sub').textContent   =
         `得点：${score}点 ／ レベル判定：${lv.name}`;
 
@@ -907,6 +917,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             timestamp,
+            name: username,
             score,
             timeout: timeoutVal,
             ratings: { ...ratings },

@@ -9,18 +9,19 @@ function doPost(e) {
 
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
-        '日時', '点数', '時間切れ',
+        '日時', '名前', '点数', '時間切れ',
         '語彙(1-5)', '構文(1-5)', '論理(1-5)', '速度(1-5)',
         'レベル', '最重要弱点',
         '語彙%', '構文%', '論理%', '速度%',
         'アドバイス',
       ]);
-      sheet.getRange(1, 1, 1, 14).setFontWeight('bold');
+      sheet.getRange(1, 1, 1, 15).setFontWeight('bold');
       sheet.setFrozenRows(1);
     }
 
     sheet.appendRow([
       data.timestamp,
+      data.name,
       data.score,
       data.timeout === 'yes' ? 'はい' : 'いいえ',
       data.ratings.vocab,
