@@ -412,6 +412,8 @@
   </div><!-- /.container -->
 
   <script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxiwzT9ouqLdtOI6GecWKFHMwRobGpzmdEgbfc4m7kNat6HllntcbRUICywSuuU-hJwFg/exec';
+
     /* ═══════════════════════════════════════════
        Data
     ═══════════════════════════════════════════ */
@@ -894,6 +896,27 @@
             <span>${d.desc}</span>
           </div>
         </div>`).join('');
+
+      /* ── Save to spreadsheet ── */
+      if (GAS_URL !== 'YOUR_GAS_URL_HERE') {
+        const now = new Date();
+        const timestamp = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        fetch(GAS_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            timestamp,
+            score,
+            timeout: timeoutVal,
+            ratings: { ...ratings },
+            level,
+            topWeakness: top.name,
+            pct: { ...pct },
+            advice: HERO_COMMENTS[top.key][level],
+          }),
+        });
+      }
 
       /* ── Show ── */
       const res = document.getElementById('result');
